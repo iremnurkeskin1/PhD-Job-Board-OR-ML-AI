@@ -240,10 +240,7 @@ const DIRECTORY = [
   { name:'Stripe',                sector:'Finance / ML',   hq:'San Francisco, CA',  roles:['Research Scientist','Applied Scientist'],            ftOpen:'Year-round', ftInterview:'Rolling',  ftStart:'Rolling',  intOpen:'Oct-Jan',   intInterview:'Jan-Mar',  intStart:'May', url:'https://stripe.com/jobs/search?q=scientist',                 visa:true,  notes:'Fraud detection and payment ML.' },
   { name:'Numerai',               sector:'Hedge Fund',     hq:'San Francisco, CA',  roles:['Research Scientist','Data Scientist'],               ftOpen:'Year-round', ftInterview:'Rolling',  ftStart:'Rolling',  intOpen:'N/A',       intInterview:'N/A',      intStart:'N/A', url:'https://numer.ai/careers',                                   visa:true,  notes:'Crowdsourced quant fund. ML research.' },
   { name:'Squarepoint Capital',   sector:'Hedge Fund',     hq:'New York, NY',       roles:['Quantitative Researcher','Data Scientist'],          ftOpen:'Sep-Nov',    ftInterview:'Nov-Jan',  ftStart:'Jul-Aug',  intOpen:'N/A',       intInterview:'N/A',      intStart:'N/A', url:'https://www.squarepoint-capital.com/careers',                visa:true,  notes:'Systematic quantitative fund.' },
-];
-
-use client';
-import { useState, useCallback, useMemo } from 'react';
+];import { useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 
 const S = {
