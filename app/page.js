@@ -1,5 +1,6 @@
 'use client';
 import { useState, useCallback } from 'react';
+import Link from 'next/link';
 
 const S = {
   bg:'#0e0f11', surface:'#16181c', surface2:'#1c1f24',
