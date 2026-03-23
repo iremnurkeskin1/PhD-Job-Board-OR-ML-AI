@@ -1,5 +1,5 @@
 'use client';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 
 const S = {
@@ -374,6 +374,10 @@ export default function Home() {
   const [resField,  setResField]  = useState('or');
   const [resSpec,   setResSpec]   = useState('all');
   const [calFilter, setCalFilter] = useState('all');
+  const [compSearch, setCompSearch] = useState('');
+  const [compSector, setCompSector] = useState('All');
+  const [compType,   setCompType]   = useState('All');
+  const [compVisa,   setCompVisa]   = useState(false);
   const [calTypeFilter, setCalTypeFilter] = useState('all');
   const [dirFilter,     setDirFilter]     = useState('All');
   const [sortBy,    setSortBy]    = useState('relevance');
@@ -474,10 +478,10 @@ export default function Home() {
 
       {/* MAIN TABS */}
       <div style={{background:S.surface,borderBottom:`1px solid ${S.border}`,padding:'0 2rem',display:'flex',alignItems:'center',gap:'.5rem'}}>
-        {[['jobs','Job Board'],['resources','Resources'],['calendar','Recruiting Calendar']].map(([t,label])=>(
+        {[['jobs','Job Board'],['resources','Resources'],['companies','Company Directory'],['calendar','Recruiting Calendar']].map(([t,label])=>(
           <button key={t} onClick={()=>setMainTab(t)} style={{
             cursor:'pointer', padding:'.9rem 1.5rem',
-            fontFamily:"'Sora',sans-serif", fontSize:'.88rem',
+            fontFamily:"'Sora',sans-serif", fontSize:'.95rem',
             fontWeight: mainTab===t ? 600 : 400,
             color: mainTab===t ? S.text : S.muted,
             background: 'none', border: 'none',
@@ -507,7 +511,7 @@ export default function Home() {
           <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(185px,1fr))',gap:'.45rem',maxWidth:820,margin:'0 auto'}}>
             {CATEGORIES.map(cat=>(
               <button key={cat.id} className="cat-btn" onClick={()=>search(cat)}
-                style={{background:activeCat===cat.id?cat.bg:S.surface,border:`1px solid ${activeCat===cat.id?cat.border:S.border}`,color:activeCat===cat.id?cat.color:S.dim,padding:'.65rem 1rem',fontFamily:"'Sora',sans-serif",fontSize:'.8rem',fontWeight:activeCat===cat.id?500:400,textAlign:'left',borderRadius:7,display:'flex',alignItems:'center',justifyContent:'space-between',gap:'.4rem'}}>
+                style={{background:activeCat===cat.id?cat.bg:S.surface,border:`1px solid ${activeCat===cat.id?cat.border:S.border}`,color:activeCat===cat.id?cat.color:S.dim,padding:'.65rem 1rem',fontFamily:"'Sora',sans-serif",fontSize:'.86rem',fontWeight:activeCat===cat.id?500:400,textAlign:'left',borderRadius:7,display:'flex',alignItems:'center',justifyContent:'space-between',gap:'.4rem'}}>
                 <span>{cat.label}</span>
                 {activeCat===cat.id && loading && <div style={{width:9,height:9,borderRadius:'50%',border:`1.5px solid ${cat.color}`,borderTopColor:'transparent',animation:'spin .7s linear infinite',flexShrink:0}}/>}
                 {activeCat===cat.id && !loading && jobs.length>0 && <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'.6rem',background:cat.bg,padding:'.06rem .32rem',borderRadius:8,flexShrink:0}}>{jobs.length}</span>}
@@ -607,8 +611,8 @@ export default function Home() {
                     <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'.54rem',padding:'.11rem .38rem',borderRadius:2,letterSpacing:'.07em',textTransform:'uppercase',background:S.surface2,color:S.muted,border:`1px solid ${S.border2}`}}>{j.sector||'Industry'}</span>
                     {j._source==='usajobs'&&<span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'.5rem',padding:'.1rem .35rem',borderRadius:2,background:'rgba(139,92,246,.1)',color:'#a78bfa',border:'1px solid rgba(139,92,246,.25)'}}>USAJobs</span>}
                   </div>
-                  <div style={{fontFamily:"'Sora',sans-serif",fontSize:'1rem',fontWeight:500,lineHeight:1.3,marginBottom:'.14rem',letterSpacing:'-.01em'}}>{j.title}</div>
-                  <div style={{fontSize:'.78rem',color:S.muted,marginBottom:'.35rem'}}><strong style={{color:S.dim,fontWeight:500}}>{j.org}</strong> · {j.location}</div>
+                  <div style={{fontFamily:"'Sora',sans-serif",fontSize:'1.08rem',fontWeight:600,lineHeight:1.3,marginBottom:'.14rem',letterSpacing:'-.01em'}}>{j.title}</div>
+                  <div style={{fontSize:'.84rem',color:S.muted,marginBottom:'.35rem'}}><strong style={{color:S.dim,fontWeight:500}}>{j.org}</strong> · {j.location}</div>
                   {j.desc&&<div style={{fontSize:'.76rem',color:S.muted,lineHeight:1.5,marginBottom:'.4rem'}}>{j.desc}</div>}
                   {j.tags?.length>0&&(
                     <div style={{display:'flex',flexWrap:'wrap',gap:'.2rem',marginBottom:'.35rem'}}>
@@ -627,18 +631,18 @@ export default function Home() {
                   {j.salary&&<div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'.72rem',color:S.green,textAlign:'right'}}>{j.salary}</div>}
                   <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'.55rem',color:S.muted,textAlign:'right'}}>{j.deadline||'See posting'}</div>
                   <a href={j.url} target="_blank" rel="noopener noreferrer"
-                    style={{display:'inline-block',background:S.blue,color:'#fff',textDecoration:'none',padding:'.45rem 1.1rem',fontFamily:"'Sora',sans-serif",fontSize:'.78rem',fontWeight:500,borderRadius:5,transition:'opacity .15s',textAlign:'center',whiteSpace:'nowrap'}}
+                    style={{display:'inline-block',background:S.blue,color:'#fff',textDecoration:'none',padding:'.5rem 1.2rem',fontFamily:"'Sora',sans-serif",fontSize:'.84rem',fontWeight:500,borderRadius:5,transition:'opacity .15s',textAlign:'center',whiteSpace:'nowrap'}}
                     onMouseOver={e=>e.target.style.opacity='.85'}
                     onMouseOut={e=>e.target.style.opacity='1'}>
                     Apply
                   </a>
                   <button onClick={()=>copyUrl(j.url,j.id||i)}
-                    style={{background:'transparent',border:`1px solid ${copied===(j.id||i)?S.green:S.border2}`,color:copied===(j.id||i)?S.green:S.muted,padding:'.38rem .75rem',fontFamily:"'JetBrains Mono',monospace",fontSize:'.68rem',cursor:'pointer',borderRadius:5,transition:'all .15s',whiteSpace:'nowrap'}}>
+                    style={{background:'transparent',border:`1px solid ${copied===(j.id||i)?S.green:S.border2}`,color:copied===(j.id||i)?S.green:S.muted,padding:'.42rem .8rem',fontFamily:"'JetBrains Mono',monospace",fontSize:'.72rem',cursor:'pointer',borderRadius:5,transition:'all .15s',whiteSpace:'nowrap'}}>
                     {copied===(j.id||i)?'Copied':'Copy link'}
                   </button>
                   {INTERVIEW_NOTES[j.org]&&(
                     <button onClick={()=>setNoteJob(noteJob===j.id?null:j.id)}
-                      style={{background:noteJob===j.id?'rgba(167,139,250,.15)':'transparent',border:`1px solid ${noteJob===j.id?'#a78bfa':S.border2}`,color:noteJob===j.id?'#a78bfa':S.muted,padding:'.38rem .75rem',fontFamily:"'JetBrains Mono',monospace",fontSize:'.68rem',cursor:'pointer',borderRadius:5,transition:'all .15s',whiteSpace:'nowrap'}}>
+                      style={{background:noteJob===j.id?'rgba(167,139,250,.15)':'transparent',border:`1px solid ${noteJob===j.id?'#a78bfa':S.border2}`,color:noteJob===j.id?'#a78bfa':S.muted,padding:'.42rem .8rem',fontFamily:"'JetBrains Mono',monospace",fontSize:'.72rem',cursor:'pointer',borderRadius:5,transition:'all .15s',whiteSpace:'nowrap'}}>
                       Interview info
                     </button>
                   )}
@@ -778,6 +782,130 @@ export default function Home() {
           })()}
         </div>
       )}
+
+      {/* COMPANY DIRECTORY TAB */}
+      {mainTab==='companies'&&(()=>{
+        const SC2 = {
+          'Big Tech':'#4f8ef7','AI Lab':'#22d3ee','Industry / OR':'#34d399',
+          'Quant Finance':'#fbbf24','Hedge Fund':'#f59e0b','Biotech / AI':'#f472b6',
+          'Consulting':'#a78bfa','Research Lab':'#34d399','Government':'#a78bfa',
+          'Logistics / OR':'#4f8ef7','Energy / OR':'#34d399','Defense':'#f87171',
+          'Healthcare AI':'#f472b6','Semiconductor':'#22d3ee','Finance / ML':'#fbbf24',
+        };
+        const allSectors = ['All',...new Set(DIRECTORY.map(c=>c.sector))].sort((a,b)=>a==='All'?-1:a.localeCompare(b));
+        const filtered = DIRECTORY.filter(c=>{
+          if(compSearch && !c.name.toLowerCase().includes(compSearch.toLowerCase()) && !c.role.toLowerCase().includes(compSearch.toLowerCase())) return false;
+          if(compSector!=='All' && c.sector!==compSector) return false;
+          if(compVisa && !c.visa) return false;
+          if(compType==='Internship' && c.intOpen==='N/A') return false;
+          return true;
+        });
+        const grouped = {};
+        filtered.forEach(c=>{ if(!grouped[c.sector]) grouped[c.sector]=[]; grouped[c.sector].push(c); });
+        return (
+          <div style={{maxWidth:1200,margin:'0 auto',padding:'2rem 2rem 4rem'}}>
+            <div style={{marginBottom:'1.5rem'}}>
+              <h1 style={{fontFamily:"'Sora',sans-serif",fontSize:'1.6rem',fontWeight:600,marginBottom:'.4rem',letterSpacing:'-.02em'}}>PhD Research Company Directory</h1>
+              <p style={{color:S.dim,fontSize:'.9rem'}}>{DIRECTORY.length} companies · recruiting timelines · direct career page links</p>
+            </div>
+
+            {/* Filters */}
+            <div style={{background:S.surface,border:`1px solid ${S.border}`,borderRadius:10,padding:'1.2rem 1.4rem',marginBottom:'1.5rem',display:'flex',flexDirection:'column',gap:'.9rem'}}>
+              <input value={compSearch} onChange={e=>setCompSearch(e.target.value)}
+                placeholder="Search company name or role..."
+                style={{background:S.surface2,border:`1px solid ${S.border2}`,borderRadius:6,padding:'.65rem 1rem',fontFamily:"'Sora',sans-serif",fontSize:'.88rem',color:S.text,outline:'none',width:'100%'}}/>
+              <div style={{display:'flex',flexWrap:'wrap',gap:'.35rem',alignItems:'center'}}>
+                <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'.65rem',color:S.muted,letterSpacing:'.08em',textTransform:'uppercase',marginRight:'.3rem'}}>Sector</span>
+                {allSectors.map(s=>(
+                  <button key={s} onClick={()=>setCompSector(s)}
+                    style={{background:compSector===s?(s==='All'?S.surface2:`${SC2[s]||S.dim}22`):'none',border:`1px solid ${compSector===s?(s==='All'?S.border2:SC2[s]||S.dim):S.border}`,color:compSector===s?(s==='All'?S.text:SC2[s]||S.dim):S.muted,padding:'.3rem .8rem',borderRadius:20,fontFamily:"'Sora',sans-serif",fontSize:'.8rem',cursor:'pointer',transition:'all .15s',whiteSpace:'nowrap'}}>
+                    {s}
+                  </button>
+                ))}
+              </div>
+              <div style={{display:'flex',flexWrap:'wrap',gap:'.8rem',alignItems:'center'}}>
+                <div style={{display:'flex',gap:'.35rem',alignItems:'center'}}>
+                  <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'.65rem',color:S.muted,letterSpacing:'.08em',textTransform:'uppercase',marginRight:'.3rem'}}>Type</span>
+                  {['All','Full-Time','Internship'].map(t=>(
+                    <button key={t} onClick={()=>setCompType(t)}
+                      style={{background:compType===t?S.surface2:'none',border:`1px solid ${compType===t?S.border2:S.border}`,color:compType===t?S.text:S.muted,padding:'.3rem .8rem',borderRadius:20,fontFamily:"'Sora',sans-serif",fontSize:'.8rem',cursor:'pointer',transition:'all .15s'}}>
+                      {t}
+                    </button>
+                  ))}
+                </div>
+                <label style={{display:'flex',alignItems:'center',gap:'.4rem',cursor:'pointer',fontFamily:"'Sora',sans-serif",fontSize:'.82rem',color:compVisa?S.green:S.muted}}>
+                  <input type="checkbox" checked={compVisa} onChange={e=>setCompVisa(e.target.checked)} style={{accentColor:S.green}}/>
+                  Visa sponsorship only
+                </label>
+                <span style={{marginLeft:'auto',fontFamily:"'JetBrains Mono',monospace",fontSize:'.65rem',color:S.muted}}>{filtered.length} companies</span>
+              </div>
+            </div>
+
+            {/* Grouped cards */}
+            {Object.entries(grouped).sort((a,b)=>a[0].localeCompare(b[0])).map(([sec,companies])=>{
+              const clr = SC2[sec]||S.dim;
+              return (
+                <div key={sec} style={{marginBottom:'2.5rem'}}>
+                  <div style={{display:'flex',alignItems:'center',gap:'.8rem',marginBottom:'1rem',paddingBottom:'.6rem',borderBottom:`1px solid ${S.border}`}}>
+                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'.75rem',letterSpacing:'.1em',textTransform:'uppercase',color:clr,fontWeight:500}}>{sec}</span>
+                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'.65rem',color:S.muted}}>{companies.length} companies</span>
+                  </div>
+                  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(320px,1fr))',gap:'.75rem'}}>
+                    {companies.map((co,i)=>(
+                      <div key={i} style={{background:S.surface,border:`1px solid ${S.border}`,borderRadius:8,padding:'1rem 1.2rem',transition:'border-color .15s,transform .15s'}}
+                        onMouseOver={e=>{e.currentTarget.style.borderColor=clr;e.currentTarget.style.transform='translateY(-2px)'}}
+                        onMouseOut={e=>{e.currentTarget.style.borderColor=S.border;e.currentTarget.style.transform='none'}}>
+                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'.5rem'}}>
+                          <div>
+                            <div style={{fontFamily:"'Sora',sans-serif",fontSize:'1rem',fontWeight:600,color:S.text,marginBottom:'.18rem'}}>{co.name}</div>
+                            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'.68rem',color:S.muted}}>{co.hq}</div>
+                          </div>
+                          <div style={{display:'flex',gap:'.3rem',flexDirection:'column',alignItems:'flex-end'}}>
+                            <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'.6rem',padding:'.1rem .42rem',borderRadius:3,background:`${clr}20`,color:clr,border:`1px solid ${clr}40`,whiteSpace:'nowrap'}}>{sec}</span>
+                            {co.visa&&<span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'.58rem',padding:'.08rem .38rem',borderRadius:3,background:'rgba(52,211,153,.1)',color:S.green,border:'1px solid rgba(52,211,153,.25)'}}>Visa OK</span>}
+                          </div>
+                        </div>
+                        <div style={{display:'flex',flexWrap:'wrap',gap:'.25rem',marginBottom:'.75rem'}}>
+                          {co.roles.map((r,j)=><span key={j} style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'.65rem',padding:'.1rem .42rem',borderRadius:3,background:S.surface2,color:S.dim,border:`1px solid ${S.border2}`}}>{r}</span>)}
+                        </div>
+                        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'.5rem',marginBottom:'.75rem'}}>
+                          <div style={{background:'rgba(79,142,247,.06)',border:'1px solid rgba(79,142,247,.2)',borderRadius:6,padding:'.5rem .65rem'}}>
+                            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'.62rem',color:S.blue,letterSpacing:'.08em',textTransform:'uppercase',marginBottom:'.35rem'}}>Full-Time</div>
+                            <div style={{fontSize:'.76rem',color:S.muted,lineHeight:1.7}}>
+                              <span style={{color:S.dim}}>Apply:</span> {co.ftOpen}<br/>
+                              <span style={{color:S.dim}}>Interview:</span> {co.ftInterview}<br/>
+                              <span style={{color:S.dim}}>Start:</span> {co.ftStart}
+                            </div>
+                          </div>
+                          <div style={{background:co.intOpen==='N/A'?'none':'rgba(251,191,36,.06)',border:`1px solid ${co.intOpen==='N/A'?S.border:'rgba(251,191,36,.2)'}`,borderRadius:6,padding:'.5rem .65rem'}}>
+                            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:'.62rem',color:co.intOpen==='N/A'?S.muted:S.amber,letterSpacing:'.08em',textTransform:'uppercase',marginBottom:'.35rem'}}>Internship</div>
+                            {co.intOpen==='N/A'
+                              ?<div style={{fontSize:'.76rem',color:S.muted}}>Not offered</div>
+                              :<div style={{fontSize:'.76rem',color:S.muted,lineHeight:1.7}}>
+                                <span style={{color:S.dim}}>Apply:</span> {co.intOpen}<br/>
+                                <span style={{color:S.dim}}>Interview:</span> {co.intInterview}<br/>
+                                <span style={{color:S.dim}}>Start:</span> {co.intStart}
+                              </div>
+                            }
+                          </div>
+                        </div>
+                        {co.notes&&<div style={{fontSize:'.78rem',color:S.muted,lineHeight:1.55,marginBottom:'.75rem',padding:'.4rem .6rem',background:S.surface2,borderRadius:5,borderLeft:`2px solid ${clr}60`}}>{co.notes}</div>}
+                        <a href={co.url} target="_blank" rel="noopener noreferrer"
+                          style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'.4rem',background:S.surface2,border:`1px solid ${S.border2}`,borderRadius:5,padding:'.45rem .8rem',textDecoration:'none',fontFamily:"'Sora',sans-serif",fontSize:'.82rem',fontWeight:500,color:S.dim,transition:'all .15s'}}
+                          onMouseOver={e=>{e.currentTarget.style.background=`${clr}15`;e.currentTarget.style.borderColor=clr;e.currentTarget.style.color=clr;}}
+                          onMouseOut={e=>{e.currentTarget.style.background=S.surface2;e.currentTarget.style.borderColor=S.border2;e.currentTarget.style.color=S.dim;}}>
+                          View open roles →
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+            {filtered.length===0&&<div style={{textAlign:'center',padding:'4rem',color:S.muted}}><p style={{fontSize:'1rem'}}>No companies match your filters</p></div>}
+          </div>
+        );
+      })()}
 
       <footer style={{borderTop:`1px solid ${S.border}`,padding:'1.5rem 2rem',textAlign:'center',fontFamily:"'JetBrains Mono',monospace",fontSize:'.58rem',color:S.muted,letterSpacing:'.07em',marginTop:'1rem'}}>
         <div style={{marginBottom:'.5rem'}}>
