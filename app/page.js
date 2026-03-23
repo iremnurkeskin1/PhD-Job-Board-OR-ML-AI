@@ -240,54 +240,7 @@ const DIRECTORY = [
   { name:'Stripe',                sector:'Finance / ML',   hq:'San Francisco, CA',  roles:['Research Scientist','Applied Scientist'],            ftOpen:'Year-round', ftInterview:'Rolling',  ftStart:'Rolling',  intOpen:'Oct-Jan',   intInterview:'Jan-Mar',  intStart:'May', url:'https://stripe.com/jobs/search?q=scientist',                 visa:true,  notes:'Fraud detection and payment ML.' },
   { name:'Numerai',               sector:'Hedge Fund',     hq:'San Francisco, CA',  roles:['Research Scientist','Data Scientist'],               ftOpen:'Year-round', ftInterview:'Rolling',  ftStart:'Rolling',  intOpen:'N/A',       intInterview:'N/A',      intStart:'N/A', url:'https://numer.ai/careers',                                   visa:true,  notes:'Crowdsourced quant fund. ML research.' },
   { name:'Squarepoint Capital',   sector:'Hedge Fund',     hq:'New York, NY',       roles:['Quantitative Researcher','Data Scientist'],          ftOpen:'Sep-Nov',    ftInterview:'Nov-Jan',  ftStart:'Jul-Aug',  intOpen:'N/A',       intInterview:'N/A',      intStart:'N/A', url:'https://www.squarepoint-capital.com/careers',                visa:true,  notes:'Systematic quantitative fund.' },
-];import { useState, useCallback, useMemo } from 'react';
-import Link from 'next/link';
-
-const S = {
-  bg:'#0e0f11', surface:'#16181c', surface2:'#1c1f24',
-  border:'#252830', border2:'#2e3340',
-  blue:'#4f8ef7', blueDim:'#3b7de8',
-  cyan:'#22d3ee', green:'#34d399', amber:'#fbbf24',
-  purple:'#a78bfa', pink:'#f472b6',
-  text:'#e8eaf0', muted:'#5a6072', dim:'#8892a4',
-};
-
-const CATEGORIES = [
-  { id:'or-ft',     label:'OR Scientist / Engineer',    color:'#4f8ef7', bg:'rgba(79,142,247,.15)',  border:'rgba(79,142,247,.3)',  query:'operations research scientist optimization engineer', keywords:['operations research scientist','operations research engineer','operations research analyst','optimization scientist','optimization engineer','optimization researcher','decision scientist'] },
-  { id:'or-int',    label:'OR PhD Internship',          color:'#4f8ef7', bg:'rgba(79,142,247,.1)',   border:'rgba(79,142,247,.2)',  query:'operations research intern phd', keywords:['operations research intern','optimization intern','industrial engineering intern','or intern'] },
-  { id:'ml-sci',    label:'ML Research Scientist',      color:'#22d3ee', bg:'rgba(34,211,238,.15)',  border:'rgba(34,211,238,.3)',  query:'machine learning research scientist', keywords:['machine learning research scientist','ml research scientist','machine learning scientist','research scientist, machine learning','research scientist machine learning'] },
-  { id:'ml-eng',    label:'ML Research Engineer',       color:'#22d3ee', bg:'rgba(34,211,238,.1)',   border:'rgba(34,211,238,.2)',  query:'machine learning research engineer', keywords:['machine learning research engineer','research engineer, machine learning','ml research engineer'] },
-  { id:'ml-int',    label:'ML PhD Internship',          color:'#22d3ee', bg:'rgba(34,211,238,.08)',  border:'rgba(34,211,238,.15)', query:'machine learning phd intern', keywords:['machine learning phd intern','machine learning research intern','ml research intern','ml phd intern'] },
-  { id:'ai-sci',    label:'AI Research Scientist',      color:'#34d399', bg:'rgba(52,211,153,.15)',  border:'rgba(52,211,153,.3)',  query:'artificial intelligence research scientist', keywords:['ai research scientist','artificial intelligence research scientist','deep learning scientist','deep learning researcher'] },
-  { id:'rl',        label:'Reinforcement Learning',     color:'#a78bfa', bg:'rgba(167,139,250,.15)', border:'rgba(167,139,250,.3)', query:'reinforcement learning researcher', keywords:['reinforcement learning researcher','reinforcement learning scientist','rl researcher','rl scientist'] },
-  { id:'nlp',       label:'NLP / LLM Scientist',        color:'#f472b6', bg:'rgba(244,114,182,.15)', border:'rgba(244,114,182,.3)', query:'nlp scientist researcher', keywords:['nlp scientist','nlp researcher','natural language processing scientist','llm researcher','llm scientist'] },
-  { id:'quant-ft',  label:'Quantitative Researcher',    color:'#fbbf24', bg:'rgba(251,191,36,.15)',  border:'rgba(251,191,36,.3)',  query:'quantitative researcher', keywords:['quantitative researcher','quant researcher','quantitative research scientist','quantitative scientist','quantitative analyst'] },
-  { id:'quant-int', label:'Quant PhD Internship',       color:'#fbbf24', bg:'rgba(251,191,36,.1)',   border:'rgba(251,191,36,.2)',  query:'quantitative research intern phd', keywords:['quantitative research intern','quant research intern','quant intern','quantitative phd intern'] },
-  { id:'applied',   label:'Applied Scientist',          color:'#4f8ef7', bg:'rgba(79,142,247,.15)',  border:'rgba(79,142,247,.3)',  query:'applied scientist', keywords:['applied scientist','applied research scientist','applied ml scientist','applied ai scientist'] },
-  { id:'data-sci',  label:'Data Scientist (Research)',  color:'#22d3ee', bg:'rgba(34,211,238,.15)',  border:'rgba(34,211,238,.3)',  query:'data scientist research phd', keywords:['staff data scientist','principal data scientist','research data scientist','data scientist phd'] },
 ];
-
-const DIRECTORY = [
-  { name:'Google',         role:'Research Scientist / Applied Scientist', url:'https://careers.google.com/jobs/results/?q=research+scientist&employment_type=FULL_TIME', sector:'Industry', note:'Search "research scientist" — filter by ML, AI, OR teams' },
-  { name:'Google DeepMind',role:'Research Scientist',                     url:'https://deepmind.google/careers/jobs/',                                                    sector:'Industry', note:'Browse all open research roles directly' },
-  { name:'Meta AI (FAIR)', role:'Research Scientist',                     url:'https://www.metacareers.com/jobs/?teams[0]=Artificial%20Intelligence&teams[1]=Research',   sector:'Industry', note:'Filter by AI and Research teams' },
-  { name:'Amazon Science', role:'Applied Scientist / Research Scientist',  url:'https://www.amazon.jobs/en/search?base_query=research+scientist&job_type=Full-Time',      sector:'Industry', note:'Search "research scientist" on Amazon Jobs' },
-  { name:'Microsoft Research',role:'Researcher',                          url:'https://careers.microsoft.com/us/en/search-results?keywords=researcher&experience=Experienced%20professionals', sector:'Industry', note:'Filter by Research division' },
-  { name:'Apple',          role:'AI/ML Research Scientist',               url:'https://jobs.apple.com/en-us/search?search=research+scientist&sort=newest',                sector:'Industry', note:'Search "research scientist" on Apple Jobs' },
-  { name:'Jane Street',    role:'Quantitative Researcher',                 url:'https://www.janestreet.com/join-jane-street/open-roles/?type=full-time-employee&role=quantitative-researcher', sector:'Finance', note:'Direct link to QR full-time roles' },
-  { name:'Two Sigma',      role:'Quantitative Researcher',                 url:'https://www.twosigma.com/careers/',                                                       sector:'Finance', note:'Browse all open research positions' },
-  { name:'Citadel',        role:'Quantitative Researcher',                 url:'https://www.citadel.com/careers/open-opportunities/students/quant/?program=Quant+Researcher', sector:'Finance', note:'Direct QR role listing' },
-  { name:'D.E. Shaw',      role:'Quantitative Analyst / Researcher',       url:'https://www.deshaw.com/careers/choose-your-path',                                        sector:'Finance', note:'Choose Quantitative Research path' },
-  { name:'Renaissance Tech',role:'Researcher',                            url:'https://careers.rentec.com/',                                                             sector:'Finance', note:'Very selective — direct application page' },
-  { name:'Bridgewater',    role:'Investment Associate / Researcher',       url:'https://www.bridgewater.com/about-bridgewater/career-opportunities',                      sector:'Finance', note:'Research and investment roles' },
-  { name:'AQR Capital',    role:'Quantitative Researcher',                 url:'https://careers.aqr.com/jobs#/',                                                         sector:'Finance', note:'Browse all quant research openings' },
-  { name:'McKinsey QuantumBlack',role:'Data Scientist / ML Engineer',     url:'https://www.mckinsey.com/careers/search-jobs#?query=quantumblack',                        sector:'Consulting', note:'Search QuantumBlack within McKinsey careers' },
-  { name:'RAND Corporation',role:'Operations Researcher',                  url:'https://www.rand.org/jobs.html',                                                          sector:'Government', note:'Policy-focused OR roles' },
-  { name:'Argonne National Lab',role:'Postdoc / Research Scientist',       url:'https://www.anl.gov/careers',                                                            sector:'Government', note:'DOE national lab — strong ML and OR groups' },
-  { name:'Sandia National Labs',role:'R&D Scientist / Engineer',           url:'https://jobs.sandia.gov/',                                                               sector:'Government', note:'US citizenship required for most roles' },
-  { name:'Oak Ridge National Lab',role:'Research Scientist',               url:'https://jobs.ornl.gov/',                                                                 sector:'Government', note:'Strong data science and computing division' },
-];
-
 
 const INTERVIEW_NOTES = {
   'Anthropic':           { rounds:'4-5 rounds', format:'Research presentation + coding + values interview', note:'Heavy focus on alignment thinking and research taste. Expect to discuss your PhD work deeply.' },
